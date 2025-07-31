@@ -18,7 +18,7 @@ Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
 10. Extract clean recall transcripts using ```bash batch_check_transcripts.sh "story"```
 
 
-### split the story into chunks of equal durations, same number of chunks as num events (Fig.2 uniform encoding, and supplemental boundary analysis)
+### Split the story into chunks of equal durations, same number of chunks as num events (Fig.2 uniform encoding, and supplemental boundary analysis)
 1. First run ```run_split_story_by_even_duration.sh``` locally to generate the unadjusted splits of the story. Output is under ```behavior_data/story_split_timing```. Then manually adjust for phrase boundaries. 
 2. Run ```run_story_even_split_analysis.sh```, packages inference code, runs both instruct and non-instruct to get I(Xi;R) (run_recall_explained_events). Also calculates H(X) (get_logits), I(Xi;Xj) (run_pairwise_events). Inference scripts called in this bash file uses --split_story_by_duration to indicate the even duration condition
 3. Use ```run_analyze_uniform_encoding.sh``` to generate dataframes for plotting
@@ -27,7 +27,7 @@ Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
 6. Use ```Uniform encoding hypothesis - by subject prevalence-split story evenly.ipynb``` to perform subject-level significance testing 
 
 
-### boundary analysis that splits the story into equal-duration or equal-token chunks (Fig.3 and supplemental results)
+### Boundary analysis that splits the story into equal-duration or equal-token chunks (Fig.3 and supplemental results)
 1. Split into equal token with 1.5xnumber of events 
     1. Generate chunks ```split_story_by_tokens.py --story {story} --factor 1.5``` Outputs 'story_even_token_factor_%.1f.csv'%args.factor in behavior_data/story_split_timing
     2. Adjust for phrase boundaries manually, save them as 'story_even_token_factor_%.1f_adjusted.csv'%args.factor, send them back to TACC
@@ -49,7 +49,7 @@ Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
 2. Send stimuli to TACC for inference to obtain CE with ```sliding_ablation_entropy.py```. 
 3. Analysis in ```event_boundary_information_cleaned.ipynb```
 
-### get model recall and inference (Fig. 5)
+### LLM-generated recalls (Fig. 5)
 1. On TACC, ```generate_model_recall.py --story {story} --n 50 --temp 0.7 --att_to_story_start --prompt_number 1```. These are the parameters that all stories should have. Need to specify the desired attention temperature on line 131. 
     Need to use the transformer env with custom Llama generation code. See implementation of the attention temperature manipulation [here](https://github.com/mujn1461/private-transformers/blob/61e7edd0a1af2baa2447d9dbb2ffd85010581efc/src/transformers/models/llama/modeling_llama.py#L295). 
 Results are saved in csv files in ```generated/{model_name}/model_recall```. 
@@ -61,13 +61,13 @@ If you rerun the ```generate_model_recall.py``` with different temps, it will co
 3. Analysis are in ```modify_llama_attention.ipynb``` to compare with attention entropy from human recalls. The rate-distortion analysis is in ```rate distortion by attention scale-no annotations.ipynb```. This nb saves dictionaries for plotting in ```generated/llama3-8b-instruct/rate_distortion```. Rate distortion plots for all stories are in ```plot rate distortion_all stories together.ipynb```. 
     
 
-### recall concatenation with original transcript (part of Fig. 5 rate distortion, gets rate and attentions)
+### Recall concatenation with original transcript (part of Fig. 5 rate distortion, gets rate and attentions)
 Packaged in ```story_recall_inference.sh```
 
-### verbatim recall simulation 
+### Verbatim recall simulation 
 1. Generate stimuli and analysis in ```verbatim recall simulation.ipynb```
 2. run ```verbatim_recall_inference.sh```
 
-### Determine attention head property 
+### Determine attention head property (induction heads)
 Use ```attention_try.ipynb``` to generate repeating stimuli and run inference to measure induction head score and duplicate token head score. Results are saved in ```generated/{model}/attention_head_test```. 
 
