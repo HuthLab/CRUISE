@@ -69,5 +69,5 @@ Packaged in ```story_recall_inference.sh```
 2. run ```verbatim_recall_inference.sh```
 
 ### Determine attention head property (induction heads)
-Use ```attention_try.ipynb``` to generate repeating stimuli and run inference to measure induction head score and duplicate token head score. Results are saved in ```generated/{model}/attention_head_test```. 
+Use ```attention_try.ipynb``` to generate repeating stimuli and run inference to measure induction head score and duplicate token head score. Results are saved in ```generated/{model}/attention_head_test```. Dependency: [TransformerLens](https://github.com/TransformerLensOrg/TransformerLens) 1.15.0: ```pip install transformer-lens==1.15.0```
 

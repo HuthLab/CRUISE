@@ -7,7 +7,6 @@ import pickle
 import glob
 import re
 import matplotlib.pyplot as plt
-from scipy import stats
 from tqdm import tqdm
 import argparse
 from utils import model_to_path_dict

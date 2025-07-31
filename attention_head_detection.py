@@ -1,4 +1,5 @@
-from transformers import AutoTokenizer,AutoConfig
+'''Adapted from TransformerLens to enable attention head detection for models directly on huggingface, instead of using HookedTransformers in the package: https://github.com/TransformerLensOrg/TransformerLens/blob/main/transformer_lens/head_detector.py'''
+from transformers import AutoConfig
 import torch 
 import joblib 
 import numpy as np
@@ -9,74 +10,14 @@ import re
 import glob
 import string
 from torch.nn import functional as F
-from natsort import os_sorted
 import matplotlib.pyplot as plt
-#import seaborn as sns
 import pandas as pd
-from tqdm.notebook import tqdm
-import transformer_lens
-from neel_plotly import line, imshow, scatter
+import logging
+from collections import defaultdict
 from typing import cast, Dict, List, Optional, Tuple, Union
 from typing_extensions import get_args, Literal
-from transformer_lens.head_detector import is_square,is_lower_triangular
+from transformer_lens.head_detector import is_square,is_lower_triangular,get_previous_token_head_detection_pattern,get_duplicate_token_head_detection_pattern,get_induction_head_detection_pattern
 
-# Previous token head
-def get_previous_token_head_detection_pattern(
-    tokens: torch.Tensor,  # [batch (1) x pos]
-) -> torch.Tensor:
-    """Outputs a detection score for [previous token heads](https://dynalist.io/d/n2ZWtnoYHrU1s4vnFSAQ519J#z=0O5VOHe9xeZn8Ertywkh7ioc).
-
-    Args:
-      tokens: Tokens being fed to the model.
-    """
-    detection_pattern = torch.zeros(tokens.shape[-1], tokens.shape[-1])
-    # Adds a diagonal of 1's below the main diagonal.
-    detection_pattern[1:, :-1] = torch.eye(tokens.shape[-1] - 1)
-    return torch.tril(detection_pattern)
-
-
-# Duplicate token head
-def get_duplicate_token_head_detection_pattern(
-    tokens: torch.Tensor,  # [batch (1) x pos]
-) -> torch.Tensor:
-    """Outputs a detection score for [duplicate token heads](https://dynalist.io/d/n2ZWtnoYHrU1s4vnFSAQ519J#z=2UkvedzOnghL5UHUgVhROxeo).
-
-    Args:
-      sequence: String being fed to the model.
-    """
-    # [pos x pos]
-    token_pattern = tokens.repeat(tokens.shape[-1], 1).numpy()
-
-    # If token_pattern[i][j] matches its transpose, then token j and token i are duplicates.
-    eq_mask = np.equal(token_pattern, token_pattern.T).astype(int)
-
-    np.fill_diagonal(
-        eq_mask, 0
-    )  # Current token is always a duplicate of itself. Ignore that.
-    detection_pattern = eq_mask.astype(int)
-    return torch.tril(torch.as_tensor(detection_pattern).float())
-
-
-# Induction head
-def get_induction_head_detection_pattern(
-    tokens: torch.Tensor,  # [batch (1) x pos]
-) -> torch.Tensor:
-    """Outputs a detection score for [induction heads](https://dynalist.io/d/n2ZWtnoYHrU1s4vnFSAQ519J#z=_tFVuP5csv5ORIthmqwj0gSY).
-
-    Args:
-      sequence: String being fed to the model.
-    """
-    duplicate_pattern = get_duplicate_token_head_detection_pattern(tokens)
-
-    # Shift all items one to the right
-    shifted_tensor = torch.roll(duplicate_pattern, shifts=1, dims=1)
-
-    # Replace first column with 0's
-    # we don't care about bos but shifting to the right moves the last column to the first,
-    # and the last column might contain non-zero values.
-    zeros_column = torch.zeros(duplicate_pattern.shape[0], 1)
-    result_tensor = torch.cat((zeros_column, shifted_tensor[:, 1:]), dim=1)
-    return torch.tril(result_tensor)
 
 HeadName = Literal["previous_token_head", "duplicate_token_head", "induction_head"]
 HEAD_NAMES = cast(List[HeadName], get_args(HeadName))
