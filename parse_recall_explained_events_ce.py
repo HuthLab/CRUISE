@@ -1,4 +1,4 @@
-# tokenize transcripts for later inference
+# calculate mutual information 
 from transformers import AutoTokenizer
 import torch 
 import numpy as np
