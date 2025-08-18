@@ -87,7 +87,6 @@ def get_duration_uniform_encoding(event_len,all_events_only_ce,pairwise_event_ex
     for event_i in range(len(event_len)):
         event_i_sum = 0
         event_i_info = torch.sum(all_events_only_ce[event_i])
-        event_i_duration = [event_i]
         for event_j in range(len(event_len)):
             event_j_info = torch.sum(all_events_only_ce[event_j])
             event_j_duration = event_duration[event_j]
