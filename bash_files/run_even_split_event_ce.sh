@@ -19,47 +19,31 @@ for story in "${stories[@]}"
 do
     echo "Processing $story"
     if [ "$split_by_token" == "true" ]; then # split by tokens
-        if [[ "$story" == "sherlock" ]]; then
-            if [ "$factor" == "None" ]; then
-                python ../get_recombine_event_ce.py --model "$model" --story "$story" --split_story_by_tokens --twosessions
+        if [ "$factor" == "None" ]; then
+            if [ "$adjusted" == "true" ]; then
+                python ../get_recombine_event_ce.py --model "$model" --story "$story" --adjusted --split_story_by_tokens
             else
-                python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --split_story_by_tokens --twosessions
+                python ../get_recombine_event_ce.py --model "$model" --story "$story" --split_story_by_tokens
             fi
-        else
-            if [ "$factor" == "None" ]; then
-                if [ "$adjusted" == "true" ]; then
-                    python ../get_recombine_event_ce.py --model "$model" --story "$story" --adjusted --split_story_by_tokens
-                else
-                    python ../get_recombine_event_ce.py --model "$model" --story "$story" --split_story_by_tokens
-                fi
-            else # factor provided
-                if [ "$adjusted" == "true" ]; then
-                    python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --adjusted --split_story_by_tokens
-                else
-                    python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --split_story_by_tokens
-                fi
+        else # factor provided
+            if [ "$adjusted" == "true" ]; then
+                python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --adjusted --split_story_by_tokens
+            else
+                python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --split_story_by_tokens
             fi
         fi
     else
-        if [[ "$story" == "sherlock" ]]; then
-            if [ "$factor" == "None" ]; then
-                python ../get_recombine_event_ce.py --model "$model" --story "$story" --split_story_by_duration --twosessions
+        if [ "$factor" == "None" ]; then
+            if [ "$adjusted" == "true" ]; then
+                python ../get_recombine_event_ce.py --model "$model" --story "$story" --adjusted --split_story_by_duration
             else
-                python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --split_story_by_duration --twosessions
+                python ../get_recombine_event_ce.py --model "$model" --story "$story" --split_story_by_duration
             fi
-        else
-            if [ "$factor" == "None" ]; then
-                if [ "$adjusted" == "true" ]; then
-                    python ../get_recombine_event_ce.py --model "$model" --story "$story" --adjusted --split_story_by_duration
-                else
-                    python ../get_recombine_event_ce.py --model "$model" --story "$story" --split_story_by_duration
-                fi
-            else # factor provided
-                if [ "$adjusted" == "true" ]; then
-                    python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --adjusted --split_story_by_duration
-                else
-                    python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --split_story_by_duration
-                fi
+        else # factor provided
+            if [ "$adjusted" == "true" ]; then
+                python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --adjusted --split_story_by_duration
+            else
+                python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --split_story_by_duration
             fi
         fi
     fi

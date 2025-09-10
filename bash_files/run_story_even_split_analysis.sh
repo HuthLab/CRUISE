@@ -9,7 +9,6 @@ else
     #stories=("pieman" "alternateithicatom" "odetostepfather" "legacy" "souls")
 fi
 
-#stories=${2:-("adventuresinsayingyes" "inamoment" "legacy" "souls" "wheretheressmoke" "sherlock")}
 stories_string="${stories[*]}"
 echo $stories_string
 
