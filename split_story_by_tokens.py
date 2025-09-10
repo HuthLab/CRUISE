@@ -114,7 +114,7 @@ def main(args):
         os.makedirs(event_timing_dir)
     split_df_timing = get_split_by_token_df(args.factor,consensus_txt,story_tokens,tokenized_txt,timing_df,original_txt,story,segmentation_indices_in_tokens,tokenizer,model_initial_char)
     split_df_timing['story'] = story
-    split_df_timing.to_csv(os.path.join(event_timing_dir,story,'story_even_token_factor_%.1f.csv'%args.factor),index=False)
+    split_df_timing.to_csv(os.path.join(event_timing_dir,'story_even_token_factor_%.1f.csv'%args.factor),index=False)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 

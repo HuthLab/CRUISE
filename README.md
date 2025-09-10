@@ -34,9 +34,9 @@ Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
 
 ### Boundary analysis that splits the story into equal-duration or equal-token chunks (Fig.3 and supplemental results)
 1. Split into equal token with 1.5xnumber of events 
-    1. Generate chunks ```split_story_by_tokens.py --story {story} --factor 1.5``` Outputs 'story_even_token_factor_%.1f.csv'%args.factor in behavior_data/story_split_timing
+    1. Generate windows ```split_story_by_tokens.py --story {story} --factor 1.5``` Outputs 'story_even_token_factor_%.1f.csv'%args.factor in behavior_data/story_split_timing
     2. Adjust for phrase boundaries manually, save them as 'story_even_token_factor_%.1f_adjusted.csv'%args.factor, send them back to TACC
-    3. Run ```bash run_story_even_split_analysis.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" "true" "false" 1.5 "true"``` This calls run_split_story_by_even_duration.sh to align the adjusted chunks to the correct timing and tokens and recalculate whether each chunk is a boundary or not, then run the full LLM inference. Results are under pairwise_event/{story}/'story_split_tokens_factor_%.1f_adjusted'%args.factor
+    3. (**Requires a GPU cluster** Output data is provided to demo subsequent steps.) Run ```bash run_story_even_split_analysis.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" "true" "false" 1.5 "true"``` This calls run_split_story_by_even_duration.sh to align the adjusted chunks to the correct timing and tokens and recalculate whether each chunk is a boundary or not, then run the full LLM inference. Results are under pairwise_event/{story}/'story_split_tokens_factor_%.1f_adjusted'%args.factor. (default factor 1.5, meaning the number of windows = 1.5 times the number of events)
     4. Calculate CRUISE, surprisal weighted sampling and controls using ```uniform encoding hypothesis-split story evenly by tokens-split with factor.ipynb```
     5. Plot using ```split story by tokens - cleaned for plotting.ipynb```
 2. Split into equal duration with 1.5 x number of events. 
