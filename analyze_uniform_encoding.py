@@ -225,11 +225,11 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 
-    parser.add_argument("--save_dir",default='../data/generated')
-    parser.add_argument("--segmentation_dir",default = '../data/behavior_data/segmentation')
-    parser.add_argument("--original_transcript_dir",default = "../data/behavior_data/transcripts",help = "directory storing lower case transcripts of story")
-    parser.add_argument("--exclusion_dir",default = "../data/behavior_data/exclusion",help = "directory storing exclusion dfs")
-    parser.add_argument("--timing_dir",default = "../data/behavior_data/transcripts/timing",help = "directory storing timing dfs")
+    parser.add_argument("--save_dir",default='../generated')
+    parser.add_argument("--segmentation_dir",default = '../behavior_data/segmentation')
+    parser.add_argument("--original_transcript_dir",default = "../behavior_data/transcripts/moth_stories",help = "directory storing lower case transcripts of story")
+    parser.add_argument("--exclusion_dir",default = "../behavior_data/exclusion",help = "directory storing exclusion dfs")
+    parser.add_argument("--timing_dir",default = "../behavior_data/transcripts/timing",help = "directory storing timing dfs")
     parser.add_argument("--story",default = 'pieman')
     parser.add_argument("--model")
     parser.add_argument("--adjusted",action = 'store_true',help = 'whether to use adjusted even split')
