@@ -10,7 +10,7 @@ Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
     ```python parse_behavioral_data.py```
     Use flag --exclude to exclude a pre-determined set of subjects. 
     For pie man, the ```Behavioral_data.ipynb``` computes the consensus segmentation, subjects' segmentation file and comprehension stats after exclusion
-5. Run ```parse parse_behavioral_data_combine.py``` (even if this story only has 1 experiment)
+5. Run ```python parse_behavioral_data_combine.py``` (even if this story only has 1 experiment)
 6. Exclusion criteria documented in ```Behavioral Results.ipynb``` and google spreadsheet Behavioral data masterlist. 
 7. Run ```parse_behavioral_data_combine.py``` again with exclusion args '--exclude'
 8. Run ```combine_recall_transcripts.py --story {story}``` to collect all checked recall transcripts into a csv file.
