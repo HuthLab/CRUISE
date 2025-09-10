@@ -123,6 +123,8 @@ def main(args):
     story_tokens = story_tokens[0,1:].cpu().detach()
 
     consensus_path = os.path.join(args.segmentation_dir,story,'%s_consensus.txt'%story)
+    print(save_dir)
+    print('ls save_dir:',os.listdir(save_dir))
     with open(consensus_path,'r') as f:
         consensus_txt = f.read()
     consensus_txt = consensus_txt.split('\n')
