@@ -191,9 +191,8 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 
-    parser.add_argument("--save_dir", default = "/work/09192/jianing/ls6/Memory_generation/generated/")
-    parser.add_argument("--original_transcript_dir",default='/work/09192/jianing/ls6/Memory_generation/transcripts/moth_stories')
-    parser.add_argument("--moth_output_dir",default = '/work/09192/jianing/ls6/Memory_generation/generated/')
+    parser.add_argument("--save_dir",default='../generated')
+    parser.add_argument("--original_transcript_dir",default = "../behavior_data/transcripts/moth_stories",help = "directory storing lower case transcripts of story")
     parser.add_argument("--story",default = 'pieman',help = 'to run the concatenated entropy of original stories, enter original')
     parser.add_argument("--model",default = 'Llama3-8b-instruct')
     parser.add_argument("--n",type = int,help = 'number of samples to generate',default = 50)

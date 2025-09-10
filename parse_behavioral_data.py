@@ -346,9 +346,9 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--dir',default = '/home/jianing/generation/behavior_data/data_exp_166306-v2',help='directory where gorilla data spreadsheets are saved')
-    parser.add_argument('--timing_dir',default = '/home/jianing/generation/transcripts/timing')
-    parser.add_argument('--consensus_dir',default='/home/jianing/generation/behavior_data/segmentation')
+    parser.add_argument('--dir',default = '../behavior_data/data_exp_166306-v2',help='directory where gorilla data spreadsheets are saved')
+    parser.add_argument('--timing_dir',default = '../behavior_data/transcripts/timing')
+    parser.add_argument('--consensus_dir',default='../behavior_data/segmentation')
     parser.add_argument('--branch_a_story1',default = 'task-bpch',help = 'audio task name of branch a, story 1')
     parser.add_argument('--branch_a_story2',default = 'task-o78z',help = 'audio task name of branch a, story 2')
     parser.add_argument('--branch_b_story1',default = 'task-ilwh',help = 'audio task name of branch b, story 1')

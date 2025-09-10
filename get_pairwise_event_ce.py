@@ -60,7 +60,7 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 
-    parser.add_argument("--save_dir",default='/work/09192/jianing/ls6/Memory_generation/generated')
+    parser.add_argument("--save_dir",default='../generated')
     parser.add_argument("--story",default = 'pieman')
     parser.add_argument("--model",default = 'Llama3-8b-instruct')
     parser.add_argument("--adjusted",action = 'store_true',help = 'use manually adjusted boundaries that respect phrase boundaries')

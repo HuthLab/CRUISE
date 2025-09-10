@@ -103,10 +103,9 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 
-    parser.add_argument("--segmentation_dir",default = '/home/jianing/generation/behavior_data/segmentation')
-    parser.add_argument("--moth_output_dir",default = '/home/jianing/generation/generated/')
-    parser.add_argument("--save_dir",default='/home/jianing/generation/generated/')
-    parser.add_argument("--original_transcript_dir",default = "/home/jianing/generation/transcripts/moth_stories",help = "directory storing lower case transcripts of story")
+    parser.add_argument("--moth_output_dir",default = '../generated')
+    parser.add_argument("--segmentation_dir",default = '../behavior_data/segmentation')
+    parser.add_argument("--original_transcript_dir",default = "../behavior_data/transcripts/moth_stories",help = "directory storing lower case transcripts of story")
     parser.add_argument("--unk", action = 'store_true',help = "whether to insert an unk token at point of ablation")
     parser.add_argument("--story",default = 'pieman')
     parser.add_argument("--model",default = 'Llama3-8b-instruct')

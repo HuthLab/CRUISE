@@ -146,7 +146,7 @@ def main(args):
     
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--parent_dir',default = '/home/jianing/generation/behavior_data/')
+    parser.add_argument('--parent_dir',default = '../behavior_data/')
     parser.add_argument('--exp1',default = 'data_exp_166306-v2',help='experiment1')
     parser.add_argument('--exp2',default = 'data_exp_156140-v6',help='experiment2, if this story only has 1 exp, type none')
     parser.add_argument('--story',default = 'alternateithicatom',help = 'story to merge across experiments')

@@ -4,7 +4,7 @@ from torch.nn import functional as F
 import torch 
 import os
 
-BASE_DIR = '/work/09192/jianing/ls6/Memory_generation'
+BASE_DIR = '..'
 model_to_path_dict={
         'Llama-2-13b-chat-hf':{
             'hf_name':"meta-llama/Llama-2-13b-chat-hf",

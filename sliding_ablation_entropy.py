@@ -20,10 +20,7 @@ def main(args):
     device = 'cuda'
 
     ### sliding window ablation 
-    if args.model=='Llama-2-13b-chat-hf':
-        moth_ablation_dir = '/work/09192/jianing/ls6/Memory_generation/ablation/sliding_window_ablation/moth_stories'
-    elif args.model=='Llama3-8b-instruct':
-        moth_ablation_dir = os.path.join(args.ablation_dir,model_to_path_dict[args.model]['save_dir_name'],'sliding_window_ablation/moth_stories')
+    moth_ablation_dir = os.path.join(args.ablation_dir,model_to_path_dict[args.model]['save_dir_name'],'sliding_window_ablation/moth_stories')
     device = 'cuda'
     
     stories = os.listdir(moth_ablation_dir)
@@ -52,6 +49,6 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 
     parser.add_argument("--model",default = 'Llama3-8b-instruct')
-    parser.add_argument("--ablation_dir",default = '/work/09192/jianing/ls6/Memory_generation/ablation')
+    parser.add_argument("--ablation_dir",default = '../ablation')
     args = parser.parse_args()
     main(args)

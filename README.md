@@ -26,7 +26,7 @@ Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
 ### Split the story into chunks of equal durations, same number of chunks as num events (Fig.2 uniform encoding, and supplemental boundary analysis)
 1. First run ```run_split_story_by_even_duration.sh``` locally to generate the unadjusted splits of the story. Output is under ```behavior_data/story_split_timing```. Then manually adjust for phrase boundaries. 
 2. (**Requires a GPU cluster** Output data is provided to demo subsequent steps.) Run ```run_story_even_split_analysis.sh```, packages inference code, runs both instruct and non-instruct to get I(Xi;R) (run_recall_explained_events). Also calculates H(X) (get_logits), I(Xi;Xj) (run_pairwise_events). Inference scripts called in this bash file uses --split_story_by_duration to indicate the even duration condition. 
-3. Use ```run_analyze_uniform_encoding.sh``` to generate dataframes for plotting
+3. Use ```run_analyze_uniform_encoding.sh``` to calculate CRUISE and other models. Generates dataframes for plotting
 4. Use ```uniform encoding hypothesis combine stories-split story evenly by duration.ipynb``` to generate scatter plots 
 5. Use ```uniform encoding hypothesis - split story evenly by duration - compare models.ipynb``` to generate bar plots of R^2
 6. Use ```Uniform encoding hypothesis - by subject prevalence-split story evenly.ipynb``` to perform subject-level significance testing 
@@ -56,9 +56,11 @@ Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
 
 ### LLM-generated recalls (Fig. 5)
 1. On TACC, ```generate_model_recall.py --story {story} --n 50 --temp 0.7 --att_to_story_start --prompt_number 1```. These are the parameters that all stories should have. Need to specify the desired attention temperature on line 131. 
-    Need to use the transformer env with custom Llama generation code. See implementation of the attention temperature manipulation [here](https://github.com/mujn1461/private-transformers/blob/61e7edd0a1af2baa2447d9dbb2ffd85010581efc/src/transformers/models/llama/modeling_llama.py#L295). To install this version of the transformer code, clone the linked repository, 
+    Need to use the transformer env with custom Llama generation code. See implementation of the attention temperature manipulation [here](https://github.com/mujn1461/private-transformers/blob/61e7edd0a1af2baa2447d9dbb2ffd85010581efc/src/transformers/models/llama/modeling_llama.py#L295). To install this version of the transformer code, clone the linked repository, then run
     ```
+    mv private-transformers transformers # renames the folder
     cd transformers
+    git checkout llama-attention
     pip install -e .
     ```
 Results are saved in csv files in ```generated/{model_name}/model_recall```. 

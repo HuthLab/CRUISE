@@ -115,7 +115,7 @@ def main(args):
     else:
         save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'prolific_data')
     
-    moth_output_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'moth_stories_output')
+    moth_output_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'moth_stories_output')
     
     if args.story =='original': # this files have all stories in it
         story_dir = os.path.join(save_dir,'original_transcript_concat')
@@ -273,13 +273,12 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 
-    parser.add_argument("--segmentation_dir",default = '/work/09192/jianing/ls6/Memory_generation/behavior_data/segmentation')
-    parser.add_argument("--save_dir", default = "/work/09192/jianing/ls6/Memory_generation/generated/")
+    parser.add_argument("--save_dir",default = '../generated')
+    parser.add_argument("--segmentation_dir",default = '../behavior_data/segmentation')
+    parser.add_argument("--original_transcript_dir",default = "../behavior_data/transcripts/moth_stories",help = "directory storing lower case transcripts of story")
     parser.add_argument("--file_name",default = 'recall_original_concat.pkl',choices = ['recall_original_concat.pkl','original_recall_concat.pkl','recall_tokens.pkl'])
     parser.add_argument("--story",default = 'pieman',help = 'to get the entropy of concatenated original stories (ie control), enter original')
     parser.add_argument("--model",default = 'Llama3-8b-instruct')
-    parser.add_argument("--original_transcript_dir",default='/work/09192/jianing/ls6/Memory_generation/transcripts/moth_stories')
-    parser.add_argument("--moth_output_dir",default = '/work/09192/jianing/ls6/Memory_generation/generated/')
     parser.add_argument("--simulation",action = 'store_true')
     parser.add_argument("--attention",action = 'store_true',help = 'compute total attention and attention entropy')
     parser.add_argument("--attention_by_event",action = 'store_true',help = 'compute attention by event')

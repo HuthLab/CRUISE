@@ -25,7 +25,7 @@ def main(args):
     else:
         save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'prolific_data')
     
-    moth_output_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'moth_stories_output')
+    moth_output_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'moth_stories_output')
     
     system_prompt = '''You are a human with limited memory ability. You're going to listen to a story, and your task is to recall the story and summarize it in your own words in a verbal recording. Respond as if you’re speaking out loud.''' 
     
@@ -241,10 +241,9 @@ def main(args):
             pickle.dump(original_story_concat_dict,f)
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 
-    parser.add_argument("--save_dir", default = "/home/jianing/generation/generated/")
-    parser.add_argument("--recall_transcript_dir",default = '/home/jianing/generation/behavior_data/recall_transcript')
-    parser.add_argument("--original_transcript_dir",default='/home/jianing/generation/transcripts/moth_stories')
-    parser.add_argument("--moth_output_dir",default = '/home/jianing/generation/generated/')
+    parser.add_argument("--save_dir",default = '../generated')
+    parser.add_argument("--original_transcript_dir",default = "../behavior_data/transcripts/moth_stories",help = "directory storing lower case transcripts of story")
+    parser.add_argument("--recall_transcript_dir",default = '../behavior_data/recall_transcript')
     parser.add_argument("--recall_only",action='store_true')
     parser.add_argument("--recall_original_concat",action = 'store_true')
     parser.add_argument("--original_recall_concat",action = 'store_true')
