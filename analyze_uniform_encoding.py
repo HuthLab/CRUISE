@@ -231,7 +231,6 @@ if __name__ == "__main__":
     parser.add_argument("--story",default = 'pieman')
     parser.add_argument("--model")
     parser.add_argument("--adjusted",action = 'store_true',help = 'whether to use adjusted even split')
-    parser.add_argument("--sherlock_transcript_dir",default = '/work/09192/jianing/ls6/Memory_generation/sherlock')
     parser.add_argument("--random_recalls",action = 'store_true',help = 'whether to use randomly sampled recalls from other stories')
     args = parser.parse_args()
     main(args)

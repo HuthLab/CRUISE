@@ -101,30 +101,10 @@ def parse_event_recall_concat(save_dir,num_events):
 def main(args):
     story = args.story
     tokenizer = AutoTokenizer.from_pretrained(model_to_path_dict[args.model]['hf_name'])
-    if args.story =='sherlock' and args.twosessions:
-        pairwise_event_save_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'pairwise_event','sherlock_2sessions')
-    else:
-        pairwise_event_save_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'pairwise_event',story)
 
-    if args.recombine:
-        if args.adjusted:
-            recombine_event_save_dir = os.path.join(pairwise_event_save_dir,'recombine_adjusted')
-            recombined_event_df = pd.read_csv(os.path.join(recombine_event_save_dir,'adjusted_recombined_event_df.csv'))
-        else:
-            recombine_event_save_dir = os.path.join(pairwise_event_save_dir,'recombine')
-            recombined_event_df = pd.read_csv(os.path.join(recombine_event_save_dir,'recombined_event_df.csv'))
-        save_dir = recombine_event_save_dir
-        num_events = len(recombined_event_df)
-    elif args.recombine_duration:
-        if args.adjusted:
-            recombine_event_save_dir = os.path.join(pairwise_event_save_dir,'recombine_duration_adjusted')
-            recombined_event_df = pd.read_csv(os.path.join(recombine_event_save_dir,'adjusted_recombined_event_df.csv'))
-        else:
-            recombine_event_save_dir = os.path.join(pairwise_event_save_dir,'recombine_duration')
-            recombined_event_df = pd.read_csv(os.path.join(recombine_event_save_dir,'recombined_event_df.csv'))
-        save_dir = recombine_event_save_dir
-        num_events = len(recombined_event_df)
-    elif args.split_story_by_duration:
+    pairwise_event_save_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'pairwise_event',story)
+
+    if args.split_story_by_duration:
         if args.adjusted:
             if args.factor is not None:
                 even_split_save_dir = os.path.join(pairwise_event_save_dir,'story_split_timing_factor_%.1f_adjusted'%args.factor)
@@ -176,13 +156,11 @@ def main(args):
         save_dir = os.path.join(save_dir,'random_recalls')
     # load recall transcripts 
     recall_transcript_dir = os.path.join(args.recall_transcript_dir,story)
-    if args.random_recalls:
-        corrected_transcript = pd.read_csv(os.path.join(recall_transcript_dir,'%s_random_recall_transcripts.csv'%story))
+
+    if args.story =='sherlock' and args.twosessions:
+        corrected_transcript = pd.read_csv(os.path.join(recall_transcript_dir,'%s_corrected_recall_transcripts_2sessions.csv'%story))
     else:
-        if args.story =='sherlock' and args.twosessions:
-            corrected_transcript = pd.read_csv(os.path.join(recall_transcript_dir,'%s_corrected_recall_transcripts_2sessions.csv'%story))
-        else:
-            corrected_transcript = pd.read_csv(os.path.join(recall_transcript_dir,'%s_corrected_recall_transcripts.csv'%story))
+        corrected_transcript = pd.read_csv(os.path.join(recall_transcript_dir,'%s_corrected_recall_transcripts.csv'%story))
     corrected_transcript = corrected_transcript.dropna(axis = 0) # drop bad subjects (nan in corrected transcript)
     subjects = corrected_transcript['subject'].astype(int)
 
@@ -201,13 +179,9 @@ if __name__ == "__main__":
     parser.add_argument("--moth_output_dir",default = '/home/jianing/generation/generated/')
     parser.add_argument("--story",default = 'pieman',help = 'to run the concatenated entropy of original stories, enter original')
     parser.add_argument("--model",default = 'Llama3-8b-instruct')
-    parser.add_argument("--recombine",action = 'store_true',help = 'used recombined events')
     parser.add_argument("--adjusted",action = 'store_true',help = 'use manually adjusted boundaries that respect phrase boundaries')
-    parser.add_argument("--recombine_duration", action = 'store_true',help = "divide events by time instead of tokens")
     parser.add_argument("--recall_event_concat",action = 'store_true',help = 'parse recall first, event next concatentation')
     parser.add_argument("--event_recall_concat",action = 'store_true',help = 'parse event first, recall next concatenation')
-    parser.add_argument("--sherlock_transcript_dir",default = '/home/jianing/generation/sherlock')
-    parser.add_argument("--twosessions",action = 'store_true',help = 'use recall and transcripts from both sessions of sherlock')
     parser.add_argument("--split_story_by_duration", action = 'store_true',help = "divide entire story into equal duration chunks")
     parser.add_argument("--split_story_by_tokens", action = 'store_true',help = "divide entire story into equal #token chunks")
     parser.add_argument("--random_recalls", action = 'store_true',help = "use recalls randomly sampled from the other stories")

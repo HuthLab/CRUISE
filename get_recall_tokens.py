@@ -22,19 +22,10 @@ def main(args):
         save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'model_recall')
     elif args.verbatim:
         save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'verbatim_recall')
-    elif args.story=='sherlock':
-        save_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'sherlock_truncated')
     else:
         save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'prolific_data')
     
-    if args.story=='sherlock':
-        moth_output_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'sherlock_truncated')
-        # load story tokens
-        story_tokens = torch.load(os.path.join(moth_output_dir,'tokens.pkl'))
-        with open(os.path.join(moth_output_dir,'tokenized_txt.pkl'),'rb') as f:
-            tokenized_txt = pickle.load(f)
-    else:
-        moth_output_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'moth_stories_output')
+    moth_output_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'moth_stories_output')
     
     system_prompt = '''You are a human with limited memory ability. You're going to listen to a story, and your task is to recall the story and summarize it in your own words in a verbal recording. Respond as if you’re speaking out loud.''' 
     
@@ -54,14 +45,9 @@ def main(args):
     corrected_transcript = corrected_transcript.dropna(axis = 0) # drop bad subjects (nan in corrected transcript)
     remove_punctuation = string.punctuation.translate(str.maketrans('', '', '\'')) # remove all punctuation except ' cuz abbreviations
     if args.recall_original_concat or args.original_recall_concat:
-        if args.story =='sherlock':
-            with open(os.path.join(args.sherlock_transcript_dir,'transcript_for_recall.txt'),'r') as f:
-                original_txt = f.read()
-            story_tokens = torch.load(os.path.join(moth_output_dir,'tokens.pkl'))
-        else:
-            with open(os.path.join(args.original_transcript_dir,'%s.txt'%story),'r') as f:
-                original_txt = f.read()
-            story_tokens = torch.load(os.path.join(moth_output_dir,story,'tokens.pkl'))
+        with open(os.path.join(args.original_transcript_dir,'%s.txt'%story),'r') as f:
+            original_txt = f.read()
+        story_tokens = torch.load(os.path.join(moth_output_dir,story,'tokens.pkl'))
         if story_tokens.device.type=='cuda':
             story_tokens = story_tokens.detach().cpu()
         
@@ -91,8 +77,6 @@ def main(args):
                 tokens_save_dir = os.path.join(save_dir,f"{story}_temp{args.temp:.2f}_prompt{args.prompt_number}_att_to_story_start_{args.att_to_story_start}_new")
             else:
                 tokens_save_dir = os.path.join(save_dir,f"{story}_temp{args.temp:.2f}_prompt{args.prompt_number}_att_to_story_start_{args.att_to_story_start}")
-        elif args.story =='sherlock':
-            tokens_save_dir = save_dir
         else:
             tokens_save_dir = os.path.join(save_dir,story)
         if not os.path.isdir(tokens_save_dir):
@@ -142,8 +126,6 @@ def main(args):
                 tokens_save_dir = os.path.join(save_dir,f"{story}_temp{args.temp:.2f}_prompt{args.prompt_number}_att_to_story_start_{args.att_to_story_start}_new")
             else:
                 tokens_save_dir = os.path.join(save_dir,f"{story}_temp{args.temp:.2f}_prompt{args.prompt_number}_att_to_story_start_{args.att_to_story_start}")
-        elif args.story =='sherlock':
-            tokens_save_dir = save_dir
         else:
             tokens_save_dir = os.path.join(save_dir,story)
         with open(os.path.join(tokens_save_dir,'recall_original_concat.pkl'),'wb') as f:
@@ -218,8 +200,6 @@ def main(args):
                 tokens_save_dir = os.path.join(save_dir,f"{story}_temp{args.temp:.2f}_prompt{args.prompt_number}_att_to_story_start_{args.att_to_story_start}_new")
             else:
                 tokens_save_dir = os.path.join(save_dir,f"{story}_temp{args.temp:.2f}_prompt{args.prompt_number}_att_to_story_start_{args.att_to_story_start}")
-        elif args.story =='sherlock':
-            tokens_save_dir = save_dir
         else:
             tokens_save_dir = os.path.join(save_dir,story)
         if args.instruct:
@@ -277,7 +257,6 @@ if __name__ == "__main__":
     parser.add_argument("--prompt_number",type = int,default = 0,help = 'prompt number')
     parser.add_argument("--instruct",help = 'use instruct prompt')
     parser.add_argument("--verbatim",action='store_true',help = 'verbatim recall experiment')
-    parser.add_argument("--sherlock_transcript_dir",default = '/home/jianing/generation/sherlock')
     parser.add_argument("--model_recall_with_entropy",action = 'store_true',help = 'new model recalls with entropy computed')
     args = parser.parse_args()
     main(args)

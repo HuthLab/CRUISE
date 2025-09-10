@@ -4,10 +4,7 @@ import os
 import pandas as pd
 import numpy as np
 import pickle
-import glob
-import re
 import matplotlib.pyplot as plt
-import itertools
 from utils import get_segmentation_indices,segmentation_to_word_list
 from utils import calculate_cross_entropy,normalize_entropy,model_to_path_dict
 from split_event_by_timing import align_timing_with_text

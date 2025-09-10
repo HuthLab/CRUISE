@@ -14,22 +14,9 @@ import gc
 
 def main(args):
     story = args.story
-    if args.story =='sherlock' and args.twosessions:
-        pairwise_event_save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'pairwise_event','sherlock_2sessions')
-    else:
-        pairwise_event_save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'pairwise_event',story)
+    pairwise_event_save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'pairwise_event',story)
 
-    if args.recombine:
-        if args.adjusted:
-            pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'recombine_adjusted')
-        else:
-            pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'recombine')
-    elif args.recombine_duration:
-        if args.adjusted:
-            pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'recombine_duration_adjusted')
-        else:
-            pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'recombine_duration')
-    elif args.split_story_by_duration:
+    if args.split_story_by_duration:
         if args.adjusted:
             if args.factor is not None:
                 pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'story_split_timing_factor_%.1f_adjusted'%args.factor)
@@ -76,10 +63,7 @@ if __name__ == "__main__":
     parser.add_argument("--save_dir",default='/work/09192/jianing/ls6/Memory_generation/generated')
     parser.add_argument("--story",default = 'pieman')
     parser.add_argument("--model",default = 'Llama3-8b-instruct')
-    parser.add_argument("--recombine", action = 'store_true',help = "divide each event into 4 parts and recombine with neighboring events")
     parser.add_argument("--adjusted",action = 'store_true',help = 'use manually adjusted boundaries that respect phrase boundaries')
-    parser.add_argument("--recombine_duration", action = 'store_true',help = "divide events by time instead of tokens")
-    parser.add_argument("--twosessions",action = 'store_true',help = 'use recall and transcripts from both sessions of sherlock')
     parser.add_argument("--split_story_by_duration", action = 'store_true',help = "divide entire story into equal duration chunks")
     parser.add_argument("--split_story_by_tokens", action = 'store_true',help = "divide entire story into equal #token chunks")
     parser.add_argument("--factor",type=float, help = 'multiplication factor, creates int(factor * #original events) total chunks for even split')

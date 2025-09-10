@@ -112,15 +112,10 @@ def main(args):
         output_save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],f'prolific_data_modified_att_{args.attention_scale}')
     elif args.verbatim:
         save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'verbatim_recall')
-    elif args.story =='sherlock':
-        save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'sherlock_truncated')
     else:
         save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'prolific_data')
     
-    if args.story =='sherlock':
-        moth_output_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'sherlock_truncated')
-    else:
-        moth_output_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'moth_stories_output')
+    moth_output_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'moth_stories_output')
     
     if args.story =='original': # this files have all stories in it
         story_dir = os.path.join(save_dir,'original_transcript_concat')
@@ -131,8 +126,6 @@ def main(args):
             story_dir = os.path.join(save_dir,f"{args.story}_temp{args.temp:.2f}_prompt{args.prompt_number}_att_to_story_start_{args.att_to_story_start}")
         elif args.model_recall_with_entropy and args.temp is not None:
             story_dir = os.path.join(save_dir,f"{args.story}_temp{args.temp:.2f}_prompt{args.prompt_number}_att_to_story_start_{args.att_to_story_start}_new")
-        elif args.story=='sherlock':
-            story_dir = save_dir
         else:
             story_dir = os.path.join(save_dir,args.story)
         with open(os.path.join(story_dir,args.file_name),'rb') as f:
