@@ -7,7 +7,7 @@ else
     stories=("pieman" "alternateithicatom" "odetostepfather")
 fi
 echo $stories
-model=${1:-"mistral-7b-instruct"} #"Llama3-8b-instruct"
+model=${1:-"Llama3-8b-instruct"} 
 echo $model
 # Loop through each story
 for story in "${stories[@]}"

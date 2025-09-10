@@ -11,7 +11,7 @@ fi
 stories_string="${stories[*]}"
 echo $stories_string
 
-model=${1:-"mistral-7b-instruct"} #"Llama3-8b-instruct"
+model=${1:-"Llama3-8b-instruct"} 
 echo $model
 random_recalls=${2:-false} 
 

@@ -7,8 +7,7 @@ else
     stories=("pieman" "alternateithicatom" "odetostepfather")
 fi
 echo $stories
-
-model=${1:-"mistral-7b-instruct"} #"Llama3-8b-instruct"
+model=${1:-"Llama3-8b-instruct"} 
 echo $model
 adjusted=${3:-false} # whether to evalutate on the adjusted version. Defaults to False
 echo "adjusted = $adjusted"

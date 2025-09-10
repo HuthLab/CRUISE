@@ -6,7 +6,7 @@ stories=("wheretheressmoke" "adventuresinsayingyes" "inamoment")
 #stories=("sherlock")
 stories_string="${stories[*]}"
 
-model=${1:-"mistral-7b-instruct"} #"Llama3-8b-instruct"
+model=${1:-"Llama3-8b-instruct"} 
 echo $model
 if printf "%s\n" "${stories[@]}" | grep -q -x "sherlock"; then
     python ../get_logits.py --sherlock --twosessions --model "$model" --save_dir ../generated --original_transcripts_dir ../transcripts/moth_stories
