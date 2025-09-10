@@ -23,7 +23,7 @@ do
     if [ "$random_recalls" == "true" ]; then
         python ../analyze_uniform_encoding.py --model "$model" --adjusted --random_recalls --story "$story" --save_dir ../../generated --segmentation_dir ../../behavior_data/segmentation --original_transcript_dir ../../behavior_data/transcripts/moth_stories --exclusion_dir ../../behavior_data/exclusion --timing_dir ../../behavior_data/transcripts/timing
     else
-        python ../analyze_uniform_encoding.py --model "$model" --adjusted --story "$story" --save_dir ../../generated --segmentation_dir ../../behavior_data/segmentation --original_transcript_dir ../../behavior_data/transcripts --exclusion_dir ../../behavior_data/exclusion --timing_dir ../../behavior_data/transcripts/timing
+        python ../analyze_uniform_encoding.py --model "$model" --adjusted --story "$story" --save_dir ../../generated --segmentation_dir ../../behavior_data/segmentation --original_transcript_dir ../../behavior_data/transcripts/moth_stories --exclusion_dir ../../behavior_data/exclusion --timing_dir ../../behavior_data/transcripts/timing
     fi
 done
 
