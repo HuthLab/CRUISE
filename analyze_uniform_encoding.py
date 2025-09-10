@@ -113,8 +113,6 @@ def main(args):
         tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-3B-Instruct")
     else:
         tokenizer = AutoTokenizer.from_pretrained(model_to_path_dict[model_name]['hf_name'])
-    print(save_dir)
-    print('ls save_dir:',os.listdir(save_dir))
     moth_output_dir = os.path.join(save_dir,model_save_dir_name,'moth_stories_output')
     with open(os.path.join(moth_output_dir,story,'cross_entropy.pkl'),'rb') as f:
         original_ce = pickle.load(f)
