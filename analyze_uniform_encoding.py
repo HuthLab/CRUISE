@@ -113,6 +113,8 @@ def main(args):
         tokenizer = AutoTokenizer.from_pretrained("meta-llama/Llama-3.2-3B-Instruct")
     else:
         tokenizer = AutoTokenizer.from_pretrained(model_to_path_dict[model_name]['hf_name'])
+    print(save_dir)
+    print('ls save_dir:',os.listdir(save_dir))
     moth_output_dir = os.path.join(save_dir,model_save_dir_name,'moth_stories_output')
     with open(os.path.join(moth_output_dir,story,'cross_entropy.pkl'),'rb') as f:
         original_ce = pickle.load(f)
@@ -123,8 +125,6 @@ def main(args):
     story_tokens = story_tokens[0,1:].cpu().detach()
 
     consensus_path = os.path.join(args.segmentation_dir,story,'%s_consensus.txt'%story)
-    print(save_dir)
-    print('ls save_dir:',os.listdir(save_dir))
     with open(consensus_path,'r') as f:
         consensus_txt = f.read()
     consensus_txt = consensus_txt.split('\n')
