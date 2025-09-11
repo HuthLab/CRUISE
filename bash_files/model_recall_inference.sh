@@ -11,7 +11,7 @@ echo $stories
 model=${1:-"Llama3-8b-instruct"} 
 echo $model
 new_with_entropy="false" #"true"
-prompt=${3:-1} # 1 is summary, 0 is as detailed as possible
+prompt=${3:-1} # 1 is summary, 2 is as detailed as possible
 for story in "${stories[@]}"
 do
     echo "Processing $story"
