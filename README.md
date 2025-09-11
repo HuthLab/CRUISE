@@ -3,9 +3,19 @@ This repository contains code used in the paper "Efficient uniform sampling expl
 
 ### Software requirements
 This repo has been tested on Linux Ubuntu 24.04.2 with Python 3.9.7 and 3.10.8
-Dependencies: numpy, scipy, pandas, matplotlib, seaborn,pytorch (tested on 2.2.1 or 2.3.1), transformers (tested on 4.33.3 and 4.45.2). 
-All code involving LLM inference was ran on a compute node with three 40G A100 GPUs. To demonstrate the analyses for users without GPU access, inference results are provided. 
-See ```notebooks``` for demos and replications of figures in the main text. 
+Dependencies: pytorch (tested on 2.2.1 and 2.3.1), transformers (tested on 4.33.3 and 4.45.2), numpy (tested on 1.24.3, 1.26.4), scipy (tested on 1.10.1, 1.13.0), pandas (tested on 1.5.0, 1.5.2), matplotlib, seaborn. 
+All code involving LLM inference was ran on a compute node with three 40G A100 GPUs. To demonstrate the subsequent analyses for users without GPU access, inference results are provided. 
+See ```notebooks``` for demos and replications of figures in the main text. Runtime for all demos should be under a minute, except for ```recall_generation_demo.ipynb```, which takes about 20s per recall. 
+
+### Setup
+Download and unzip the data from box. Within the same directory, clone the current repo. The final directory structure should be: 
+```
+- root dir
+    - CRUISE
+    - abaltion 
+    - behavior_data
+    - generated
+```
 
 ### Behavioral data parsing 
 Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
@@ -24,7 +34,7 @@ Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
 10. Extract clean recall transcripts using ```bash batch_check_transcripts.sh "story"```
 
 
-### Split the story into chunks of equal durations, same number of chunks as num events (Fig.2 uniform encoding, and supplemental boundary analysis)
+### Split the story into windows of equal durations, same number of windows as num events (Fig.2 uniform encoding, and supplemental boundary analysis)
 1. First run ```run_split_story_by_even_duration.sh``` locally to generate the unadjusted splits of the story. Output is under ```behavior_data/story_split_timing```. Then manually adjust for phrase boundaries. 
 2. (Requires a GPU cluster. Output data is provided to demo subsequent steps.) Run ```run_story_even_split_analysis.sh```, packages inference code, runs both instruct and non-instruct to get I(Xi;R) (run_recall_explained_events). Also calculates H(X) (get_logits), I(Xi;Xj) (run_pairwise_events). Inference scripts called in this bash file uses --split_story_by_duration to indicate the even duration condition. 
 3. Use ```run_analyze_uniform_encoding.sh``` to calculate CRUISE and other models. Generates dataframes for plotting
@@ -33,17 +43,17 @@ Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
 6. Use ```Uniform encoding hypothesis - by subject prevalence-split story evenly.ipynb``` to perform subject-level significance testing 
 
 
-### Boundary analysis that splits the story into equal-duration or equal-token chunks (Fig.3 and supplemental results)
+### Boundary analysis that splits the story into equal-duration or equal-token windows (Fig.3 and supplemental results)
 1. Split into equal token with 1.5xnumber of events 
     1. Generate windows ```split_story_by_tokens.py --story {story} --factor 1.5``` Outputs 'story_even_token_factor_%.1f.csv'%args.factor in behavior_data/story_split_timing
     2. Adjust for phrase boundaries manually, save them as 'story_even_token_factor_%.1f_adjusted.csv'%args.factor, send them back to TACC
-    3. (Requires a GPU cluster. Output data is provided to demo subsequent steps.) Run ```bash run_story_even_split_analysis.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" "true" "false" 1.5 "true"``` This calls run_split_story_by_even_duration.sh to align the adjusted chunks to the correct timing and tokens and recalculate whether each chunk is a boundary or not, then run the full LLM inference. Results are under pairwise_event/{story}/'story_split_tokens_factor_%.1f_adjusted'%args.factor. (default factor 1.5, meaning the number of windows = 1.5 times the number of events)
+    3. (Requires a GPU cluster. Output data is provided to demo subsequent steps.) Run ```bash run_story_even_split_analysis.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" "true" "false" 1.5 "true"``` This calls run_split_story_by_even_duration.sh to align the adjusted windows to the correct timing and tokens and recalculate whether each window is a boundary or not, then run the full LLM inference. Results are under pairwise_event/{story}/'story_split_tokens_factor_%.1f_adjusted'%args.factor. (default factor 1.5, meaning the number of windows = 1.5 times the number of events)
     4. Calculate CRUISE, surprisal weighted sampling and controls using ```uniform encoding hypothesis-split story evenly by tokens-split with factor.ipynb```
     5. Plot using ```split story by tokens - cleaned for plotting.ipynb```
 2. Split into equal duration with 1.5 x number of events. 
-    1. Generate chunks ```bash run_split_story_by_even_duration.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" "false" 1.5 "false"```. Outputs 'story_even_duration_factor_%.1f.csv'%args.factor in behavior_data/story_split_timing
+    1. Generate windows ```bash run_split_story_by_even_duration.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" "false" 1.5 "false"```. Outputs 'story_even_duration_factor_%.1f.csv'%args.factor in behavior_data/story_split_timing
     2. Adjust for phrase boundaries manually, save them as 'story_even_duration_factor_%.1f_adjusted.csv'%args.factor
-    3. Run ```bash run_story_even_split_analysis.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" "true" "false" 1.5 "false"``` This calls run_split_story_by_even_duration.sh to align the adjusted chunks to the correct timing and tokens, then run the full LLM inference. Results are under pairwise_event/{story}/'story_split_timing_factor_%.1f_adjusted'%args.factor
+    3. Run ```bash run_story_even_split_analysis.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" "true" "false" 1.5 "false"``` This calls run_split_story_by_even_duration.sh to align the adjusted windows to the correct timing and tokens, then run the full LLM inference. Results are under pairwise_event/{story}/'story_split_timing_factor_%.1f_adjusted'%args.factor
     4. Calculate CRUISE, surprisal weighted sampling and controls using code similar to the equal token split
     5. Plot using ```split story evenly by duration - chunks with boundary vs. no boundary cleaned for plotting.ipynb```
 
