@@ -1,6 +1,6 @@
 #!/bin/bash
 # run inference to get recall-story concat CE, and story-recall concat cross entropy and attention
-stories=("souls") #("adventuresinsayingyes" "wheretheressmoke") #("legacy" "souls" "inamoment") # ("adventuresinsayingyes" "inamoment" "legacy" "souls" "wheretheressmoke")
+stories=("pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment") 
 model=${1:-"Llama3-8b-instruct"} 
 echo $model
 for story in "${stories[@]}"
