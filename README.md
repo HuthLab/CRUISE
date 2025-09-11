@@ -64,10 +64,10 @@ Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
     git checkout llama-attention # make sure you're on the right branch
     pip install -e .
     ```
-Results are saved in csv files in ```generated/{model_name}/model_recall```. 
-If you rerun the ```generate_model_recall.py``` with different attention temperatures, it will concatenate new generations onto existing ones using the same parameters
+    Results are saved in csv files in ```generated/{model_name}/model_recall```. 
+    If you rerun the ```generate_model_recall.py``` with different attention temperatures, it will concatenate new generations onto existing ones using the same parameters
 
-See a demo of model-generated recalls in ```recall_generation_demo.ipynb```. (Requires a GPU cluster. Tested on a compute node with three 40G A100 GPUs. Wall time of generating 30 recalls was 9 mins.) To run the demo, follow [these instructions](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) to access the Llama3-8b-instruct model. Then follow the insturctions [here](https://huggingface.co/docs/huggingface_hub/en/guides/cli) to setup commandline access to your huggingface account. 
+    See a demo of model-generated recalls in ```recall_generation_demo.ipynb```. (Requires a GPU cluster. Tested on a compute node with three 40G A100 GPUs. Wall time of generating 30 recalls was 9 mins.) To run the demo, follow [these instructions](https://huggingface.co/meta-llama/Meta-Llama-3-8B-Instruct) to access the Llama3-8b-instruct model. Then follow the insturctions [here](https://huggingface.co/docs/huggingface_hub/en/guides/cli) to setup commandline access to your huggingface account. 
 2. Calculate how much recall explains about the story for model-generated recalls: (requires a cluster, output provided) ```bash model_recall_inference.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" 1```. Remember to change the stories you want to run inference on. If you generated new recalls using the same params, this inference code will append the new inference results onto existing ones. 
 3. Calculate how much recall explains about the story for human recalls, and attention entropy from recall to story tokens: ```bash story_recall_inference.sh```(requires a cluster, output provided in ```generated/llama3-8b-instruct/prolific_data```)
 3. The rate-distortion calculation is in ```rate distortion by attention scale-no annotations.ipynb```. This nb saves dictionaries for plotting in ```generated/llama3-8b-instruct/rate_distortion```. Rate distortion plots for all stories are in ```plot rate distortion_all stories together.ipynb```. 
