@@ -17,23 +17,6 @@ Download and unzip the data from box. Within the same directory, clone the curre
     - generated
 ```
 
-## Behavioral data parsing 
-Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
-1. Generate participant_info spreadsheet by running ```python parse_output_spreadsheets.py```. Contains columns: prolific_id, gorilla_id, story, audio_task. See args for details, need to change the data directory for each new experiment. 
-2. For tasks with multiple stories, run ```python group_audio_files.py``` to copy the audio files into their respective story directories. Saves under ```behavior_data/recall_audio/story```
-3. Transcribe recall transcripts using ```transcribe_audio.py```
-4. Extract segmentation, calculate segmentation consensus, comprehension accuracy with 
-    ```python parse_behavioral_data.py```
-    Use flag --exclude to exclude a pre-determined set of subjects. 
-    For pie man, the ```Behavioral_data.ipynb``` computes the consensus segmentation, subjects' segmentation file and comprehension stats after exclusion
-5. Run ```python parse_behavioral_data_combine.py``` (even if this story only has 1 experiment)
-6. Exclusion criteria documented in ```Behavioral Results.ipynb``` and google spreadsheet Behavioral data masterlist. 
-7. Run ```parse_behavioral_data_combine.py``` again with exclusion args '--exclude'
-8. Run ```combine_recall_transcripts.py --story {story}``` to collect all checked recall transcripts into a csv file.
-9. To get the event number of each detail in the story coding files, use the first few cells in the ```recall coding metrics.ipynb```. 
-10. Extract clean recall transcripts using ```bash batch_check_transcripts.sh "story"```
-
-
 ## Split the story into windows of equal durations, number of windows = number of events (Fig.2 uniform encoding, and supplemental boundary analysis)
 1. First run ```run_split_story_by_even_duration.sh``` locally to generate the unadjusted splits of the story. Output is under ```behavior_data/story_split_timing```. Then manually adjust for phrase boundaries. 
 2. (Requires a GPU cluster. Output data is provided to demo subsequent steps.) Run ```run_story_even_split_analysis.sh```, packages inference code, runs both instruct and non-instruct concatenations to get I(Xi;R) (run_recall_explained_events.sh). Also calculates H(X) (get_logits), I(Xi;Xj) (run_pairwise_events.sh). Inference scripts called in this bash file uses --split_story_by_duration to indicate the even duration condition. 
