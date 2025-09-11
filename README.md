@@ -1,23 +1,23 @@
 # CRUISE
 This repository contains code used in the paper "Efficient uniform sampling explains non-uniform memory of narrative stories" by Jianing Mu, Alison R. Preston and Alexander G. Huth. 
 
-### Software requirements
+## Software requirements
 This repo has been tested on Linux Ubuntu 24.04.2 with Python 3.9.7 and 3.10.8
 Dependencies: pytorch (tested on 2.2.1 and 2.3.1), transformers (tested on 4.33.3 and 4.45.2), numpy (tested on 1.24.3, 1.26.4), scipy (tested on 1.10.1, 1.13.0), pandas (tested on 1.5.0, 1.5.2), matplotlib, seaborn. 
 All code involving LLM inference was ran on a compute node with three 40G A100 GPUs. To demonstrate the subsequent analyses for users without GPU access, inference results are provided. 
 See ```notebooks``` for demos and replications of figures in the main text. Runtime for all demos should be under a minute, except for ```recall_generation_demo.ipynb```, which takes about 20s per recall. 
 
-### Setup
+## Setup
 Download and unzip the data from box. Within the same directory, clone the current repo. The final directory structure should be: 
 ```
 - root dir
     - CRUISE
-    - abaltion 
+    - ablation 
     - behavior_data
     - generated
 ```
 
-### Behavioral data parsing 
+## Behavioral data parsing 
 Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
 1. Generate participant_info spreadsheet by running ```python parse_output_spreadsheets.py```. Contains columns: prolific_id, gorilla_id, story, audio_task. See args for details, need to change the data directory for each new experiment. 
 2. For tasks with multiple stories, run ```python group_audio_files.py``` to copy the audio files into their respective story directories. Saves under ```behavior_data/recall_audio/story```
@@ -34,38 +34,38 @@ Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
 10. Extract clean recall transcripts using ```bash batch_check_transcripts.sh "story"```
 
 
-### Split the story into windows of equal durations, same number of windows as num events (Fig.2 uniform encoding, and supplemental boundary analysis)
+## Split the story into windows of equal durations, number of windows = number of events (Fig.2 uniform encoding, and supplemental boundary analysis)
 1. First run ```run_split_story_by_even_duration.sh``` locally to generate the unadjusted splits of the story. Output is under ```behavior_data/story_split_timing```. Then manually adjust for phrase boundaries. 
-2. (Requires a GPU cluster. Output data is provided to demo subsequent steps.) Run ```run_story_even_split_analysis.sh```, packages inference code, runs both instruct and non-instruct to get I(Xi;R) (run_recall_explained_events). Also calculates H(X) (get_logits), I(Xi;Xj) (run_pairwise_events). Inference scripts called in this bash file uses --split_story_by_duration to indicate the even duration condition. 
-3. Use ```run_analyze_uniform_encoding.sh``` to calculate CRUISE and other models. Generates dataframes for plotting
-4. Use ```uniform encoding hypothesis combine stories-split story evenly by duration.ipynb``` to generate scatter plots 
+2. (Requires a GPU cluster. Output data is provided to demo subsequent steps.) Run ```run_story_even_split_analysis.sh```, packages inference code, runs both instruct and non-instruct concatenations to get I(Xi;R) (run_recall_explained_events.sh). Also calculates H(X) (get_logits), I(Xi;Xj) (run_pairwise_events.sh). Inference scripts called in this bash file uses --split_story_by_duration to indicate the even duration condition. 
+3. Use ```run_analyze_uniform_encoding.sh``` to calculate CRUISE and other models. Generates dataframes for plotting. Also see demo in ```uniform encoding hypothesis-split story evenly by duration.ipynb```
+4. Use ```uniform encoding hypothesis combine stories-split story evenly by duration.ipynb``` to generate scatter plots with regression fits
 5. Use ```uniform encoding hypothesis - split story evenly by duration - compare models.ipynb``` to generate bar plots of R^2
 6. Use ```Uniform encoding hypothesis - by subject prevalence-split story evenly.ipynb``` to perform subject-level significance testing 
 
 
-### Boundary analysis that splits the story into equal-duration or equal-token windows (Fig.3 and supplemental results)
+## Boundary analysis that splits the story into equal-duration or equal-token windows (Fig.3 and supplemental results)
 1. Split into equal token with 1.5xnumber of events 
     1. Generate windows ```split_story_by_tokens.py --story {story} --factor 1.5``` Outputs 'story_even_token_factor_%.1f.csv'%args.factor in behavior_data/story_split_timing
-    2. Adjust for phrase boundaries manually, save them as 'story_even_token_factor_%.1f_adjusted.csv'%args.factor, send them back to TACC
-    3. (Requires a GPU cluster. Output data is provided to demo subsequent steps.) Run ```bash run_story_even_split_analysis.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" "true" "false" 1.5 "true"``` This calls run_split_story_by_even_duration.sh to align the adjusted windows to the correct timing and tokens and recalculate whether each window is a boundary or not, then run the full LLM inference. Results are under pairwise_event/{story}/'story_split_tokens_factor_%.1f_adjusted'%args.factor. (default factor 1.5, meaning the number of windows = 1.5 times the number of events)
+    2. Adjust for phrase boundaries manually, save them as 'story_even_token_factor_%.1f_adjusted.csv'%args.factor, send them back to the cluster
+    3. (Requires a GPU cluster. Output data is provided to demo subsequent steps.) Run ```bash run_story_even_split_analysis.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" "true" "false" 1.5 "true"``` This calls ```run_split_story_by_even_duration.sh``` to align the adjusted windows to the correct timing and tokens and recalculate whether each window is a boundary or not, then run the full LLM inference. Results are under pairwise_event/{story}/'story_split_tokens_factor_%.1f_adjusted'%args.factor. (default factor 1.5, meaning the number of windows = 1.5 times the number of events)
     4. Calculate CRUISE, surprisal weighted sampling and controls using ```uniform encoding hypothesis-split story evenly by tokens-split with factor.ipynb```
     5. Plot using ```split story by tokens - cleaned for plotting.ipynb```
-2. Split into equal duration with 1.5 x number of events. 
+2. Split into equal duration with 1.5 x number of events (Supplemental Fig. S10)
     1. Generate windows ```bash run_split_story_by_even_duration.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" "false" 1.5 "false"```. Outputs 'story_even_duration_factor_%.1f.csv'%args.factor in behavior_data/story_split_timing
     2. Adjust for phrase boundaries manually, save them as 'story_even_duration_factor_%.1f_adjusted.csv'%args.factor
     3. Run ```bash run_story_even_split_analysis.sh "Llama3-8b-instruct" ""pieman" "alternateithicatom" "odetostepfather" "legacy" "souls" "wheretheressmoke" "adventuresinsayingyes" "inamoment"" "true" "false" 1.5 "false"``` This calls run_split_story_by_even_duration.sh to align the adjusted windows to the correct timing and tokens, then run the full LLM inference. Results are under pairwise_event/{story}/'story_split_timing_factor_%.1f_adjusted'%args.factor
     4. Calculate CRUISE, surprisal weighted sampling and controls using code similar to the equal token split
     5. Plot using ```split story evenly by duration - chunks with boundary vs. no boundary cleaned for plotting.ipynb```
 
-### Time courses of information properties around boundaries (Fig. 3jkl) and surprisal around boundaries vs. baseline (Supplement)
+## Time courses of information properties around boundaries (Fig. 3jkl) and surprisal around boundaries vs. baseline (Supplement)
 ```CE around event boundaries vs. random chunks.ipynb```
 
-### Mutual information of windows within event vs. across one event boundary (Fig. 4)
+## Mutual information of windows within event vs. across one event boundary (Fig. 4)
 1. ```event_boundary_information.ipynb``` generates count balanced ablation stimuli in ```ablation/{model_name}/sliding_window_ablation/moth_stories```. 
 2. (Requires a GPU cluster. Inference results are provided for subsequent analyses) Send stimuli to cluster for inference to obtain CE with ```sliding_ablation_entropy.py```. 
-3. Analysis in ```event_boundary_information_cleaned.ipynb```
+3. Analysis and replication of Fig. 4 in ```event_boundary_information_cleaned.ipynb```
 
-### Rate-distortion plot of LLM-generated recalls and human recalls (Fig. 5)
+## Rate-distortion plot of LLM-generated recalls and human recalls (Fig. 5)
 1. Generate recalls with attention temperature manipulation: On a cluster, ```generate_model_recall.py --story {story} --n 50 --temp 0.7 --att_to_story_start --prompt_number 1```. These are the parameters that all stories should have. Need to specify the desired attention temperature on line 131. 
     The attention temperature manipulation is implemented in an editable install of Transformers. See implementation of the attention temperature manipulation [here](https://github.com/mujn1461/private-transformers/blob/61e7edd0a1af2baa2447d9dbb2ffd85010581efc/src/transformers/models/llama/modeling_llama.py#L295). To install this version of Transformers, create a fresh conda environment. Install pytorch (tested with 2.0.1), numpy, pandas. Then clone the linked repository, run
     ```
@@ -83,10 +83,10 @@ Raw Gorilla data to transcripts and segmentation, get metrics from recall coding
 3. The rate-distortion calculation is in ```rate distortion by attention scale-no annotations.ipynb```. This nb saves dictionaries for plotting in ```generated/llama3-8b-instruct/rate_distortion```. Rate distortion plots for all stories are in ```plot rate distortion_all stories together.ipynb```. 
     
 
-### Verbatim recall simulation 
+## Verbatim recall simulation 
 1. Generate stimuli and analysis in ```verbatim recall simulation.ipynb```
 2. run ```verbatim_recall_inference.sh``` (Requires a GPU cluster, output provided)
 
-### Determine attention head property (induction heads)
+## Determine attention head property (induction heads)
 (Requires a GPU cluster. Output data is provided to demo subsequent steps.) Requires a GPU cluster: Use ```attention_try.ipynb``` to generate repeating stimuli and run inference to measure induction head score and duplicate token head score. Results are saved in ```generated/{model}/attention_head_test```. Dependency: [TransformerLens](https://github.com/TransformerLensOrg/TransformerLens) 1.15.0: ```pip install transformer-lens==1.15.0```
 
