@@ -1,6 +1,6 @@
 #!/bin/bash
 # run inference to get recall-story concat and story-recall concat cross entropy for verbatim recalls
-stories=("adventuresinsayingyes" "inamoment" "legacy" "souls" "wheretheressmoke") # ("adventuresinsayingyes" "inamoment" "legacy" "souls" "wheretheressmoke")
+stories=("pieman" "alternateithicatom" "odetostepfather" "adventuresinsayingyes" "inamoment" "legacy" "souls" "wheretheressmoke") 
 model=${1:-"Llama3-8b-instruct"} 
 echo $model
 for story in "${stories[@]}"
