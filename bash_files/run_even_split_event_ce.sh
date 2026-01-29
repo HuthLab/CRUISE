@@ -18,33 +18,17 @@ echo "split evenly by token = $split_by_token"
 for story in "${stories[@]}"
 do
     echo "Processing $story"
-    if [ "$split_by_token" == "true" ]; then # split by tokens
-        if [ "$factor" == "None" ]; then
-            if [ "$adjusted" == "true" ]; then
-                python ../get_recombine_event_ce.py --model "$model" --story "$story" --adjusted --split_story_by_tokens
-            else
-                python ../get_recombine_event_ce.py --model "$model" --story "$story" --split_story_by_tokens
-            fi
-        else # factor provided
-            if [ "$adjusted" == "true" ]; then
-                python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --adjusted --split_story_by_tokens
-            else
-                python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --split_story_by_tokens
-            fi
-        fi
+    args=(--story "$story" --model "$model" --save_dir ../generated)
+ 
+    # Add flags conditionally
+    [ "$adjusted" == "true" ] && args+=(--adjusted)
+    if [[ "$split_by_token" == "true" ]]; then
+        args+=(--split_story_by_tokens)
     else
-        if [ "$factor" == "None" ]; then
-            if [ "$adjusted" == "true" ]; then
-                python ../get_recombine_event_ce.py --model "$model" --story "$story" --adjusted --split_story_by_duration
-            else
-                python ../get_recombine_event_ce.py --model "$model" --story "$story" --split_story_by_duration
-            fi
-        else # factor provided
-            if [ "$adjusted" == "true" ]; then
-                python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --adjusted --split_story_by_duration
-            else
-                python ../get_recombine_event_ce.py --factor $factor --model "$model" --story "$story" --split_story_by_duration
-            fi
-        fi
+        args+=(--split_story_by_duration)
     fi
+    [ "$factor" != "None" ] && args+=(--factor "$factor")
+
+    echo "Running: python ../get_recombine_event_ce.py ${args[*]}"
+    python ../get_recombine_event_ce.py ${args[*]}
 done
