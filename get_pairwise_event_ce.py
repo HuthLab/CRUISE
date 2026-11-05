@@ -14,6 +14,7 @@ import gc
 
 def main(args):
     story = args.story
+    calibration_temp = args.calibration_temp
     pairwise_event_save_dir = os.path.join(args.save_dir,model_to_path_dict[args.model]['save_dir_name'],'pairwise_event',story)
 
     if args.split_story_by_duration:
@@ -50,13 +51,19 @@ def main(args):
         with torch.no_grad():
             output = model(torch.unsqueeze(input_token,0).to(device),return_dict = True)
         logits = output['logits'].detach().cpu()
+        if args.calibration_temp is not None:
+            logits = logits/calibration_temp
         entropy = calculate_cross_entropy(input_token[1:],logits[0,:-1],base2=True) # excluding bos token 
         pairwise_event_ce[pair] = entropy
         del output, logits
         gc.collect()
         torch.cuda.empty_cache()
-    with open(os.path.join(pairwise_event_save_dir,'pairwise_event_ce.pkl'),'wb') as f:
-        pickle.dump(pairwise_event_ce,f)
+    if calibration_temp is not None:
+        with open(os.path.join(pairwise_event_save_dir,'pairwise_event_ce_caltemp_%.2f.pkl'%calibration_temp),'wb') as f:
+            pickle.dump(pairwise_event_ce,f)
+    else:
+        with open(os.path.join(pairwise_event_save_dir,'pairwise_event_ce.pkl'),'wb') as f:
+            pickle.dump(pairwise_event_ce,f)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 
@@ -67,5 +74,6 @@ if __name__ == "__main__":
     parser.add_argument("--split_story_by_duration", action = 'store_true',help = "divide entire story into equal duration chunks")
     parser.add_argument("--split_story_by_tokens", action = 'store_true',help = "divide entire story into equal #token chunks")
     parser.add_argument("--factor",type=float, help = 'multiplication factor, creates int(factor * #original events) total chunks for even split')
+    parser.add_argument("--calibration_temp",type = float, help = 'calibration temperature')
     args = parser.parse_args()
     main(args)

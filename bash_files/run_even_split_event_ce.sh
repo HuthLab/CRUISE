@@ -18,7 +18,7 @@ echo "split evenly by token = $split_by_token"
 for story in "${stories[@]}"
 do
     echo "Processing $story"
-    args=(--story "$story" --model "$model" --save_dir ../generated)
+    args=(--story "$story" --model "$model" --save_dir ../../generated)
  
     # Add flags conditionally
     [ "$adjusted" == "true" ] && args+=(--adjusted)

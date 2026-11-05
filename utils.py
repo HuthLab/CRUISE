@@ -2,6 +2,7 @@ import string
 import numpy as np
 from torch.nn import functional as F
 import torch 
+from scipy.stats import entropy
 import os
 
 BASE_DIR = '..'
@@ -84,6 +85,22 @@ def normalize_entropy(tokens_lower,entropy_lower,mean_token_entropy,verbose = Tr
                 print('%d - \'%s\' not in mean_token_entropy dict'%(curr_token,tokenizer.decode(curr_token)))
     assert sum(normalized_entropy==-1)==0
     return normalized_entropy
+
+def kl(logits):
+    '''
+    Input: torch Tensor logits (batch size, seq len+1, vocab) (assuming no batching rn)
+    Output: numpy array KL(t,t-1), size seq len
+    '''
+    logits = logits[0]
+    prob = F.softmax(logits,dim=1) # softmax over each row (all vocab in a seq position)
+    #assert torch.allclose(torch.sum(prob,axis = 1),torch.Tensor([1]).to(device))
+    prob = prob.detach().cpu().numpy()
+    assert np.allclose(np.sum(prob,axis=1),1)
+    prob_start = prob[:-1,:]
+    prob_end = prob[1:,:]
+    kl = entropy(prob_end,prob_start,axis = 1,base = 2) # KL(t,t-1), order matters
+    assert len(kl) == logits.shape[0]-1, 'KL vector should equal to sequence length (without BOS)'
+    return kl
 
 def segmentation_to_word_list(human_output):
     '''

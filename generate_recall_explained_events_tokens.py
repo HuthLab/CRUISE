@@ -144,19 +144,30 @@ def main(args):
     pairwise_event_save_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'pairwise_event',story)
     if not os.path.exists(pairwise_event_save_dir):
         os.makedirs(pairwise_event_save_dir)
+    # separate the directory that we read split timing df from and where the save things. 
+    # For SR experiment, we read the split timing df from the original pairwise_event_save_dir, but save the output tokens in the sr_save_dir
+    # For original experiment, both read and save in the pairwise_event_save_dir
+    if args.sr_exp:
+        output_save_dir = os.path.join(args.sr_save_dir,model_to_path_dict[args.model]['save_dir_name'],'pairwise_event',story)
+    else:
+        output_save_dir = pairwise_event_save_dir
 
     if args.split_story_by_duration:
         if args.adjusted:
             if args.factor is not None:
                 pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'story_split_timing_factor_%.1f_adjusted'%args.factor)
+                output_save_dir = os.path.join(output_save_dir,'story_split_timing_factor_%.1f_adjusted'%args.factor)
             else:
                 pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'story_split_timing_adjusted')
+                output_save_dir = os.path.join(output_save_dir,'story_split_timing_adjusted')
             even_duration_split_df = pd.read_csv(os.path.join(pairwise_event_save_dir,'story_split_by_duration_df_adjusted.csv'))
         else:
             if args.factor is not None:
                 pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'story_split_timing_factor_%.1f'%args.factor)
+                output_save_dir = os.path.join(output_save_dir,'story_split_timing_factor_%.1f'%args.factor)
             else:
                 pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'story_split_timing')
+                output_save_dir = os.path.join(output_save_dir,'story_split_timing')
             even_duration_split_df = pd.read_csv(os.path.join(pairwise_event_save_dir,'story_split_by_duration_df.csv'))
         event_txt =  even_duration_split_df['text'].values
         event_start_indices = even_duration_split_df['event_starts']
@@ -165,14 +176,18 @@ def main(args):
         if args.adjusted:
             if args.factor is not None:
                 pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'story_split_tokens_factor_%.1f_adjusted'%args.factor)
+                output_save_dir = os.path.join(output_save_dir,'story_split_tokens_factor_%.1f_adjusted'%args.factor)
             else:
                 pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'story_split_tokens_adjusted')
+                output_save_dir = os.path.join(output_save_dir,'story_split_tokens_adjusted')
             even_token_split_df = pd.read_csv(os.path.join(pairwise_event_save_dir,'story_split_by_token_df_adjusted.csv'))
         else:
             if args.factor is not None:
                 pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'story_split_tokens_factor_%.1f'%args.factor)
+                output_save_dir = os.path.join(output_save_dir,'story_split_tokens_factor_%.1f'%args.factor)
             else:
                 pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'story_split_tokens')
+                output_save_dir = os.path.join(output_save_dir,'story_split_tokens')
             even_token_split_df = pd.read_csv(os.path.join(pairwise_event_save_dir,'story_split_by_token_df.csv'))
         event_txt =  even_token_split_df['text'].values
         event_start_indices = even_token_split_df['event_starts']
@@ -189,9 +204,9 @@ def main(args):
     print('num recalls',len(corrected_transcript))
     
     if args.random_recalls:
-        save_dir = os.path.join(pairwise_event_save_dir,'random_recalls')
+        save_dir = os.path.join(output_save_dir,'random_recalls')
     else:
-        save_dir = pairwise_event_save_dir
+        save_dir = output_save_dir
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
@@ -226,5 +241,7 @@ if __name__ == "__main__":
     parser.add_argument("--split_story_by_tokens", action = 'store_true',help = "divide entire story into equal #token chunks")
     parser.add_argument("--random_recalls", action = 'store_true',help = "use recalls randomly sampled from the other stories")
     parser.add_argument("--factor",type=float, help = 'multiplication factor, creates int(factor * #original events) total chunks for even split')
+    parser.add_argument("--sr_save_dir", default = "../exp2/generated")
+    parser.add_argument("--sr_exp", action = 'store_true',help = 'use speech rate exp (save output to sr_save_dir)')
     args = parser.parse_args()
     main(args)

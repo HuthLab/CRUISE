@@ -12,7 +12,7 @@ do
     for scale in "${attention_scales[@]}"
     do
         echo "$scale"
-        python ../get_recall_logits.py --model "$model" --file_name original_recall_concat.pkl --attention --entropy --story "$story" --attention_scale "$scale"
+        python ../get_recall_logits.py --save_dir ../../generated --segmentation_dir ../../behavior_data/segmentation --original_transcript_dir ../../behavior_data/transcripts/moth_stories --model "$model" --file_name original_recall_concat.pkl --attention --entropy --story "$story" --attention_scale "$scale"
     done
 done
 

@@ -14,15 +14,21 @@ import argparse
 import string
 from utils import model_to_path_dict
 
-def parse_recall_event_concat(save_dir,subjects):
+def parse_recall_event_concat(save_dir,subjects,calibration_temp):
     with open(os.path.join(save_dir,'event_only_stim_instruct.pkl'),'rb') as f:
         event_only_stim_dict = pickle.load(f)
     with open(os.path.join(save_dir,'recall_event_stim_instruct.pkl'),'rb') as f:
         recall_event_stim_dict = pickle.load(f)
-    with open(os.path.join(save_dir,'event_only_ce_instruct.pkl'),'rb') as f:
-        event_only_ce = pickle.load(f)
-    with open(os.path.join(save_dir,'recall_event_ce_instruct.pkl'),'rb') as f:
-        recall_event_ce_dict = pickle.load(f)
+    if calibration_temp is not None:
+        with open(os.path.join(save_dir,'event_only_ce_instruct_caltemp_%.2f.pkl'%calibration_temp),'rb') as f:
+            event_only_ce = pickle.load(f)
+        with open(os.path.join(save_dir,'recall_event_ce_instruct_caltemp_%.2f.pkl'%calibration_temp),'rb') as f:
+            recall_event_ce_dict = pickle.load(f)
+    else:
+        with open(os.path.join(save_dir,'event_only_ce_instruct.pkl'),'rb') as f:
+            event_only_ce = pickle.load(f)
+        with open(os.path.join(save_dir,'recall_event_ce_instruct.pkl'),'rb') as f:
+            recall_event_ce_dict = pickle.load(f)
     all_events = []
     all_subjects = []
     all_ce_diff = []
@@ -62,18 +68,27 @@ def parse_recall_event_concat(save_dir,subjects):
     recall_explained_info_df = pd.DataFrame({'event':all_events,
                                              'subject':all_subjects,
                                              'ER_intersect':np.array(all_ce_diff)})
-    recall_explained_info_df.to_csv(os.path.join(save_dir,'recall_explained_event_ce_df.csv'),index = False)
+    if calibration_temp is not None:
+        recall_explained_info_df.to_csv(os.path.join(save_dir,'recall_explained_event_ce_df_caltemp_%.2f.csv'%calibration_temp),index = False)
+    else:
+        recall_explained_info_df.to_csv(os.path.join(save_dir,'recall_explained_event_ce_df.csv'),index = False)
 
 
-def parse_event_recall_concat(save_dir,num_events):
+def parse_event_recall_concat(save_dir,num_events,calibration_temp):
     with open(os.path.join(save_dir,'recall_only_stim_instruct.pkl'),'rb') as f:
         recall_only_stim_dict = pickle.load(f)
-    with open(os.path.join(save_dir,'recall_only_ce_instruct.pkl'),'rb') as f:
-        recall_only_ce = pickle.load(f)
     with open(os.path.join(save_dir,'event_recall_stim_instruct.pkl'),'rb') as f:
         event_recall_stim_dict = pickle.load(f)
-    with open(os.path.join(save_dir,'event_recall_ce_instruct.pkl'),'rb') as f:
-        event_recall_ce_dict = pickle.load(f)
+    if calibration_temp is not None:
+        with open(os.path.join(save_dir,'recall_only_ce_instruct_caltemp_%.2f.pkl'%calibration_temp),'rb') as f:
+            recall_only_ce = pickle.load(f)
+        with open(os.path.join(save_dir,'event_recall_ce_instruct_caltemp_%.2f.pkl'%calibration_temp),'rb') as f:
+            event_recall_ce_dict = pickle.load(f)
+    else:
+        with open(os.path.join(save_dir,'recall_only_ce_instruct.pkl'),'rb') as f:
+            recall_only_ce = pickle.load(f)
+        with open(os.path.join(save_dir,'event_recall_ce_instruct.pkl'),'rb') as f:
+            event_recall_ce_dict = pickle.load(f)
     subjects = recall_only_stim_dict['subject']
     all_events = []
     all_subjects = []
@@ -105,49 +120,65 @@ def parse_event_recall_concat(save_dir,num_events):
     recall_explained_info_df = pd.DataFrame({'event':all_events,
                                              'subject':all_subjects,
                                              'ER_intersect':np.array(all_ce_diff)})
-    recall_explained_info_df.to_csv(os.path.join(save_dir,'event_explained_recall_ce_df.csv'),index = False)
+    if calibration_temp is not None:
+        recall_explained_info_df.to_csv(os.path.join(save_dir,'event_explained_recall_ce_df_caltemp_%.2f.csv'%calibration_temp),index = False)
+    else:
+        recall_explained_info_df.to_csv(os.path.join(save_dir,'event_explained_recall_ce_df.csv'),index = False)
 
 
 
 def main(args):
     story = args.story
     tokenizer = AutoTokenizer.from_pretrained(model_to_path_dict[args.model]['hf_name'])
+    calibration_temp = args.calibration_temp
     pairwise_event_save_dir = os.path.join(args.moth_output_dir,model_to_path_dict[args.model]['save_dir_name'],'pairwise_event',story)
+    # separate the directory that we read split timing df from and where the save things. 
+    # For SR experiment, we read the split timing df from the original pairwise_event_save_dir, but save the output tokens in the sr_save_dir
+    # For original experiment, both read and save in the pairwise_event_save_dir
+    if args.sr_exp:
+        save_dir = os.path.join(args.sr_save_dir,model_to_path_dict[args.model]['save_dir_name'],'pairwise_event',story)
+    else:
+        save_dir = pairwise_event_save_dir
 
     if args.split_story_by_duration:
         if args.adjusted:
             if args.factor is not None:
                 even_split_save_dir = os.path.join(pairwise_event_save_dir,'story_split_timing_factor_%.1f_adjusted'%args.factor)
+                save_dir = os.path.join(save_dir,'story_split_timing_factor_%.1f_adjusted'%args.factor)
             else:
                 even_split_save_dir = os.path.join(pairwise_event_save_dir,'story_split_timing_adjusted')
+                save_dir = os.path.join(save_dir,'story_split_timing_adjusted')
             even_duration_split_df = pd.read_csv(os.path.join(even_split_save_dir,'story_split_by_duration_df_adjusted.csv'))
         else:
             if args.factor is not None:
                 even_split_save_dir = pairwise_event_save_dir = os.path.join(pairwise_event_save_dir,'story_split_timing_factor_%.1f'%args.factor)
+                save_dir = os.path.join(save_dir,'story_split_timing_factor_%.1f'%args.factor)
             else:
                 even_split_save_dir = os.path.join(pairwise_event_save_dir,'story_split_timing')
+                save_dir = os.path.join(save_dir,'story_split_timing')
             even_duration_split_df = pd.read_csv(os.path.join(even_split_save_dir,'story_split_by_duration_df.csv'))
-        save_dir = even_split_save_dir
         num_events = len(even_duration_split_df)
     elif args.split_story_by_tokens:
         if args.adjusted:
             if args.factor is not None:
                 even_split_save_dir = os.path.join(pairwise_event_save_dir,'story_split_tokens_factor_%.1f_adjusted'%args.factor)
+                save_dir = os.path.join(save_dir,'story_split_tokens_factor_%.1f_adjusted'%args.factor)
             else:
                 even_split_save_dir = os.path.join(pairwise_event_save_dir,'story_split_tokens_adjusted')
+                save_dir = os.path.join(save_dir,'story_split_tokens_adjusted')
             even_token_split_df = pd.read_csv(os.path.join(even_split_save_dir,'story_split_by_token_df_adjusted.csv'))
         else:
             if args.factor is not None:
                 even_split_save_dir = os.path.join(pairwise_event_save_dir,'story_split_tokens_factor_%.1f'%args.factor)
+                save_dir = os.path.join(save_dir,'story_split_tokens_factor_%.1f'%args.factor)
             else:
                 even_split_save_dir = os.path.join(pairwise_event_save_dir,'story_split_tokens')
+                save_dir = os.path.join(save_dir,'story_split_tokens')
             even_token_split_df = pd.read_csv(os.path.join(even_split_save_dir,'story_split_by_token_df.csv'))
-        save_dir = even_split_save_dir
         num_events = len(even_token_split_df)
 
 
     else:
-        save_dir = pairwise_event_save_dir
         # load consensus
         consensus_path = os.path.join(args.segmentation_dir,story,'%s_consensus.txt'%args.story)
         with open(consensus_path,'r') as f:
@@ -169,17 +200,17 @@ def main(args):
     subjects = corrected_transcript['subject'].astype(int)
 
     if args.recall_event_concat:
-        parse_recall_event_concat(save_dir,subjects)
+        parse_recall_event_concat(save_dir,subjects,calibration_temp)
     if args.event_recall_concat:
-        parse_event_recall_concat(save_dir,num_events)
+        parse_event_recall_concat(save_dir,num_events,calibration_temp)
     
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser() 
-    parser.add_argument("--moth_output_dir",default = '../generated')
     parser.add_argument("--segmentation_dir",default = '../behavior_data/segmentation')
-    parser.add_argument("--original_transcript_dir",default = "../behavior_data/transcripts/moth_stories",help = "directory storing lower case transcripts of story")
     parser.add_argument("--recall_transcript_dir",default = '../behavior_data/recall_transcript')
+    parser.add_argument("--original_transcript_dir",default = "../behavior_data/transcripts/moth_stories",help = "directory storing lower case transcripts of story")
+    parser.add_argument("--moth_output_dir",default = '../generated')
     parser.add_argument("--story",default = 'pieman',help = 'to run the concatenated entropy of original stories, enter original')
     parser.add_argument("--model",default = 'Llama3-8b-instruct')
     parser.add_argument("--adjusted",action = 'store_true',help = 'use manually adjusted boundaries that respect phrase boundaries')
@@ -189,5 +220,8 @@ if __name__ == "__main__":
     parser.add_argument("--split_story_by_tokens", action = 'store_true',help = "divide entire story into equal #token chunks")
     parser.add_argument("--random_recalls", action = 'store_true',help = "use recalls randomly sampled from the other stories")
     parser.add_argument("--factor",type=float, help = 'multiplication factor, creates int(factor * #original events) total chunks for even split')
+    parser.add_argument("--calibration_temp",type = float, help = 'calibration temperature')
+    parser.add_argument("--sr_save_dir", default = "../exp2/generated")
+    parser.add_argument("--sr_exp", action = 'store_true',help = 'use speech rate exp (save output to sr_save_dir)')
     args = parser.parse_args()
     main(args)

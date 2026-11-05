@@ -21,8 +21,8 @@ echo "Calibration temp = $calibration_temp"
 for story in "${stories[@]}"
 do
     echo "Processing $story"
-    generate_stimuli_args=(--story "$story" --model "$model" --save_dir ../generated --segmentation_dir ../behavior_data/segmentation --original_transcript_dir ../transcripts/moth_stories --moth_output_dir ../generated)
-    get_ce_args=(--story "$story" --model "$model" --save_dir ../generated)
+    generate_stimuli_args=(--story "$story" --model "$model" --save_dir ../../generated --segmentation_dir ../../behavior_data/segmentation --original_transcript_dir ../../behavior_data/transcripts/moth_stories --moth_output_dir ../../generated)
+    get_ce_args=(--story "$story" --model "$model" --save_dir ../../generated)
  
     arg_sets=(generate_stimuli_args get_ce_args)
 

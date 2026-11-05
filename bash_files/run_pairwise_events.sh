@@ -13,6 +13,6 @@ echo $model
 for story in "${stories[@]}"
 do
     echo "Processing $story"
-    python ../generate_pairwise_event_stimuli.py --story "$story" --model "$model" --save_dir ../generated --segmentation_dir ../behavior_data/segmentation --original_transcript_dir ../transcripts/moth_stories --moth_output_dir ../generated
-    python ../get_pairwise_event_ce.py --story "$story" --model "$model" --save_dir ../generated
+    python ../generate_pairwise_event_stimuli.py --story "$story" --model "$model" --save_dir ../../generated --segmentation_dir ../../behavior_data/segmentation --original_transcript_dir ../../behavior_data/transcripts/moth_stories --moth_output_dir ../../generated
+    python ../get_pairwise_event_ce.py --story "$story" --model "$model" --save_dir ../../generated
 done

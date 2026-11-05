@@ -20,13 +20,15 @@ split_by_token=${6:-None}
 echo "split evenly by token = $split_by_token"
 calibration_temp=${7:-None}
 echo "Calibration temp = $calibration_temp"
+sr_exp=${8:-false} # speech rate exp, uses sr transcripts instead of the original
+echo "speech rate exp = $sr_exp"
 
 for story in "${stories[@]}"
 do
     echo "Processing $story"
-    tokens_args=(--story "$story" --model "$model" --event_recall_concat --recall_event_concat --save_dir ../generated --segmentation_dir ../behavior_data/segmentation --recall_transcript_dir ../behavior_data/recall_transcript --original_transcript_dir ../transcripts/moth_stories --moth_output_dir ../generated)
+    tokens_args=(--story "$story" --model "$model" --event_recall_concat --recall_event_concat --segmentation_dir ../../behavior_data/segmentation --original_transcript_dir ../../behavior_data/transcripts/moth_stories --moth_output_dir ../../generated)
     get_ce_args=(--story "$story" --model "$model" --event_recall_concat --recall_event_concat)
-    parse_ce_args=(--story "$story" --model "$model"  --event_recall_concat --recall_event_concat --save_dir ../generated --segmentation_dir ../behavior_data/segmentation --recall_transcript_dir ../behavior_data/recall_transcript --original_transcript_dir ../transcripts/moth_stories --moth_output_dir ../generated)
+    parse_ce_args=(--story "$story" --model "$model"  --event_recall_concat --recall_event_concat --segmentation_dir ../../behavior_data/segmentation --original_transcript_dir ../../behavior_data/transcripts/moth_stories --moth_output_dir ../../generated)
 
     arg_sets=(tokens_args get_ce_args parse_ce_args)
 
@@ -44,6 +46,18 @@ do
             [ "$calibration_temp" != "None" ] && eval "$arr+=(--calibration_temp \"$calibration_temp\")"
         fi
     done
+
+    if [[ "$sr_exp" == "true" ]]; then
+        tokens_args+=(--sr_exp --sr_save_dir ../../exp2/generated --recall_transcript_dir ../../exp2/behavior_data/recall_transcript)
+        parse_ce_args+=(--sr_exp --sr_save_dir ../../exp2/generated --recall_transcript_dir ../../exp2/behavior_data/recall_transcript)
+        get_ce_args+=(--save_dir ../../exp2/generated)
+
+    else
+        tokens_args+=(--recall_transcript_dir ../../behavior_data/recall_transcript)
+        parse_ce_args+=(--recall_transcript_dir ../../behavior_data/recall_transcript)
+        get_ce_args+=(--save_dir ../../generated)
+    fi
+
 
     # Optional debugging log
     echo "Running: python ../generate_recall_explained_events_tokens.py ${tokens_args[*]}"
