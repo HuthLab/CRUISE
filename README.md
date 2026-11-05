@@ -23,7 +23,7 @@ Download and unzip the data from box. Within the same directory, clone the curre
 3. Use ```run_analyze_uniform_encoding.sh``` to calculate CRUISE and other models. Generates dataframes for plotting. Also see demo in ```uniform encoding hypothesis-split story evenly by duration.ipynb```
 4. Use ```uniform encoding hypothesis combine stories-split story evenly by duration.ipynb``` to generate scatter plots with regression fits
 5. Use ```uniform encoding hypothesis - split story evenly by duration - compare models.ipynb``` to generate bar plots of R^2
-6. Use ```Uniform encoding hypothesis - by subject prevalence-split story evenly.ipynb``` to perform subject-level significance testing 
+6. Use ```Uniform encoding hypothesis - by subject prevalence-split story evenly - cleaned.ipynb``` to perform subject-level significance testing 
 
 
 ## Boundary analysis that splits the story into equal-duration or equal-token windows (Fig.3 and supplemental results)
